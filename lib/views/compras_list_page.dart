@@ -2,6 +2,7 @@ import 'package:carpintex/views/AgregarCompraPage.dart';
 import 'package:carpintex/views/ConnectionStatus.dart';
 import 'package:carpintex/views/EditarCompraPage.dart';
 import 'package:carpintex/views/admin_drawer.dart';
+import 'package:carpintex/views/widgets/alertas.dart';
 import 'package:carpintex/views/widgets/compra_card.dart';
 import 'package:carpintex/views/widgets/sort_dropdown.dart'; // Importa el SortDropdown
 import 'package:carpintex/views/widgets/search_bar.dart' as myWidgets;
@@ -42,15 +43,19 @@ class _ComprasConNombresPageState extends State<ComprasConNombresPage> {
   }
 
   void onDeleteCompra(int id) {
-    widget.apiService.eliminarCompra(id).then((_) {
-      _fetchComprasConNombres(); // Recarga los registros si se eliminó una compra
-    }).catchError((error) {
-      // Maneja el error si algo sale mal
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al eliminar la compra: $error')),
-      );
+    // Muestra el diálogo antes de eliminar
+    showDeleteDialog(context, () {
+      widget.apiService.eliminarCompra(id).then((_) {
+        _fetchComprasConNombres(); // Recarga los registros si se eliminó una compra
+      }).catchError((error) {
+        // Maneja el error si algo sale mal
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al eliminar la compra: $error')),
+        );
+      });
     });
   }
+
 
 
 
@@ -137,7 +142,7 @@ class _ComprasConNombresPageState extends State<ComprasConNombresPage> {
             icon: Icon(Icons.menu), // Ícono de menú hamburguesa
             onPressed: () => _scaffoldKey.currentState!.openDrawer(), // Abre el drawer usando la clave del Scaffold
           ),
-
+          backgroundColor: Color(0xFF483D8B),
         ),
         drawer: AdminDrawer(),
 
@@ -215,8 +220,13 @@ class _ComprasConNombresPageState extends State<ComprasConNombresPage> {
               _fetchComprasConNombres(); // Recarga los registros si se agregó una compra
             }
           },
-          child: Icon(Icons.add),
+          backgroundColor: Color(0xFF483D8B), // Define el color morado oscuro
+          child: Icon(
+            Icons.add_shopping_cart, // Cambia el icono a uno que represente añadir una compra
+            color: Colors.white, // Define el color del icono como blanco para mayor contraste
+          ),
         ),
+
       ),
     );
   }

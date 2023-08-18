@@ -9,14 +9,14 @@ void showDeleteDialog(BuildContext context, Function onDelete) {
         content: Text('¿Desea eliminar esta compra? Esta acción no se va a poder deshacer.'),
         actions: [
           TextButton.icon(
-            icon: Icon(Icons.cancel, color: Colors.red),
+            icon: Icon(Icons.cancel, color: Colors.deepPurpleAccent),
             label: Text('No'),
             onPressed: () {
               Navigator.of(context).pop(); // Cierra el diálogo
             },
           ),
           TextButton.icon(
-            icon: Icon(Icons.delete, color: Colors.green),
+            icon: Icon(Icons.delete, color: Colors.deepOrangeAccent),
             label: Text('Sí, eliminar'),
             onPressed: () {
               onDelete(); // Llama a la función de eliminación

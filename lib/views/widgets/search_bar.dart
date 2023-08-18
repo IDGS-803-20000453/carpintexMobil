@@ -15,7 +15,14 @@ class SearchBar extends StatelessWidget {
         controller: controller,
         decoration: InputDecoration(
           labelText: 'Buscar',
-          suffixIcon: Icon(Icons.search),
+          labelStyle: TextStyle(color: Color(0xFF483D8B)), // Cambia el color del indicador
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF483D8B)), // Cambia el color del borde cuando está enfocado
+          ),
+    suffixIcon: Icon(
+    Icons.search,
+    color: Color(0xFF483D8B),
+        ),
         ),
         onChanged: onChanged,
       ),

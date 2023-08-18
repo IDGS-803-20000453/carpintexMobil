@@ -26,7 +26,7 @@ class LoginApiService {
         prefs.setString('name', jsonResponse['name']);
         prefs.setString('email', jsonResponse['email']);
         prefs.setString('passwordUsuario', jsonResponse['passwordUsuario']);
-
+        prefs.setInt('rol_id', jsonResponse['rol_id']);
         return rolId;
       } else if (response.statusCode == 404) {
         print('Error: Usuario no encontrado');

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:carpintex/services/api_service.dart';
+import 'package:carpintex/services/productos_api_service.dart';
 import 'package:carpintex/views/ConnectionStatus.dart';
 import 'package:carpintex/views/compras_list_page.dart';
 import 'package:carpintex/views/login.dart'; // Asegúrate de importar la clase Login aquí
+import 'package:carpintex/views/productos_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -19,13 +21,22 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides(); // Usa MyHttpOverrides para deshabilitar la validación SSL
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ConnectionStatus(),
-      child: MyApp(),
-    ),
-  );
+
+  // Bloquea la orientación en modo vertical
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ])
+      .then((_) {
+    runApp(
+      ChangeNotifierProvider(
+        create: (context) => ConnectionStatus(),
+        child: MyApp(),
+      ),
+    );
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -58,21 +69,40 @@ class _IntroPageState extends State<IntroPage> {
     String? userEmail = prefs.getString('email');
 
     // Comprueba si los valores de SharedPreferences son diferentes de los predeterminados
-    if (userName != null && userName != 'Nombre de Usuario' && userEmail != null && userEmail != 'email@dominio.com') {
-      print('Navigating to Compras List page...');
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ComprasConNombresPage(apiService: ComprasApiService()),
-        ),
-      );
+    // Leer el valor del ID de las preferencias compartidas
+    int? rol_id = prefs.getInt('rol_id');
+
+    if (rol_id != null) {
+      print('Navigating based on user ID...');
+      if (rol_id == 1) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ComprasConNombresPage(apiService: ComprasApiService()),
+          ),
+        );
+      } else if (rol_id == 2) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ProductosListPage(apiService: ProductosApiService()), // Redirige a la página de productos
+          ),
+        );
+      } else {
+        // Redirigir a la página de inicio de sesión si el ID no es 1 o 2
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => Login(),
+          ),
+        );
+      }
     } else {
-      print('Navigating to Login page...');
+      // Redirigir a la página de inicio de sesión si el ID es nulo
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => Login(), // Cambia a la clase Login
+          builder: (context) => Login(),
         ),
       );
     }
+
   }
 
   @override

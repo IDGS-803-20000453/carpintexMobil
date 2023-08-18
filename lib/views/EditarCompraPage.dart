@@ -14,6 +14,19 @@ class EditarCompraPage extends StatefulWidget {
 }
 
 class _EditarCompraPageState extends State<EditarCompraPage> {
+
+  InputDecoration _getInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Color(0xFF483D8B)), // Cambia el color del texto a morado
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF483D8B)), // Cambia el color de la línea a morado
+      ),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF483D8B)), // Cambia el color de la línea a morado
+      ),
+    );
+  }
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _cantidadController = TextEditingController();
   final TextEditingController _totalController = TextEditingController();
@@ -69,13 +82,14 @@ class _EditarCompraPageState extends State<EditarCompraPage> {
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(2000),
-        lastDate: DateTime(2101))) ??
+        lastDate: DateTime.now())) ?? // Cambiar a la fecha actual
         selectedDate;
     if (picked != selectedDate)
       setState(() {
         selectedDate = picked;
       });
   }
+
 
   void _editarCompra() async {
     if (_formKey.currentState!.validate()) {
@@ -102,6 +116,8 @@ class _EditarCompraPageState extends State<EditarCompraPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Editar Compra"),
+        backgroundColor: Color(0xFF483D8B), // Cambia el color del AppBar
+
       ),
       body: Form(
         key: _formKey,
@@ -111,14 +127,12 @@ class _EditarCompraPageState extends State<EditarCompraPage> {
             children: [
               TextFormField(
                 controller: _cantidadController,
-                decoration: InputDecoration(labelText: 'Cantidad'),
-                keyboardType: TextInputType.number,
+                decoration: _getInputDecoration('Cantidad'),                keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: _totalController,
-                decoration: InputDecoration(labelText: 'Total'),
-                keyboardType: TextInputType.number,
+                decoration: _getInputDecoration('Total'),                keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
               Row(
@@ -128,11 +142,14 @@ class _EditarCompraPageState extends State<EditarCompraPage> {
                   ElevatedButton(
                     onPressed: () => _selectDate(context),
                     child: Text('Seleccionar Fecha'),
+                      style: ElevatedButton.styleFrom(
+                  primary: Color(0xFF483D8B), // Cambia el color del botón a morado
+      ),
                   ),
                 ],
               ),
               DropdownButtonFormField(
-                value: _selectedMateriaPrima, // Utiliza el valor seleccionado
+                value: _selectedMateriaPrima,
                 items: materiasPrimas.map((item) {
                   return DropdownMenuItem<String>(
                     value: item['id'].toString(),
@@ -142,9 +159,10 @@ class _EditarCompraPageState extends State<EditarCompraPage> {
                 onChanged: (value) => setState(() => _selectedMateriaPrima = value),
                 hint: Text('Selecciona Materia Prima'),
                 validator: (value) => value == null ? 'Campo requerido' : null,
+                decoration: _getInputDecoration('Materia Prima'),
               ),
               DropdownButtonFormField(
-                value: _selectedProveedor, // Utiliza el valor seleccionado
+                value: _selectedProveedor,
                 items: proveedores.map((item) {
                   return DropdownMenuItem<String>(
                     value: item['id'].toString(),
@@ -154,16 +172,23 @@ class _EditarCompraPageState extends State<EditarCompraPage> {
                 onChanged: (value) => setState(() => _selectedProveedor = value),
                 hint: Text('Selecciona Proveedor'),
                 validator: (value) => value == null ? 'Campo requerido' : null,
+                decoration: _getInputDecoration('Proveedor'), // Agregar esta línea
               ),
+
 
               ElevatedButton(
                 onPressed: _editarCompra,
                 child: Text('Editar Compra'),
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFF483D8B), // Cambia el color del botón a morado
+                )
+                ,
               ),
             ],
           ),
         ),
       ),
     );
+
   }
 }

@@ -45,6 +45,9 @@ class _AdminDrawerState extends State<AdminDrawer> {
           UserAccountsDrawerHeader(
             accountName: Text(userName),
             accountEmail: Text(userEmail),
+            decoration: BoxDecoration(
+              color: Color(0xFF483D8B), // Color de fondo morado oscuro
+            ),
             // Otros parámetros si los necesitas
           ),
 

@@ -4,6 +4,8 @@ import 'package:carpintex/services/compras_api_service.dart';
 import 'package:flutter/material.dart';
 
 class AgregarCompraPage extends StatefulWidget {
+
+
   final ComprasApiService apiService;
 
   AgregarCompraPage({required this.apiService});
@@ -86,6 +88,8 @@ class _AgregarCompraPageState extends State<AgregarCompraPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Agregar Compra"),
+        backgroundColor: Color(0xFF483D8B), // Cambia el color del AppBar
+
       ),
       body: Form(
         key: _formKey,
@@ -95,13 +99,13 @@ class _AgregarCompraPageState extends State<AgregarCompraPage> {
             children: [
               TextFormField(
                 controller: _cantidadController,
-                decoration: InputDecoration(labelText: 'Cantidad'),
+                decoration: _getInputDecoration('Cantidad'),
                 keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
               TextFormField(
                 controller: _totalController,
-                decoration: InputDecoration(labelText: 'Total'),
+                decoration: _getInputDecoration('Total'),
                 keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
               ),
@@ -112,6 +116,9 @@ class _AgregarCompraPageState extends State<AgregarCompraPage> {
                   ElevatedButton(
                     onPressed: () => _selectDate(context),
                     child: Text('Seleccionar Fecha'),
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFF483D8B),
+                        ),
                   ),
                 ],
               ),
@@ -125,6 +132,8 @@ class _AgregarCompraPageState extends State<AgregarCompraPage> {
                 onChanged: (value) => setState(() => _selectedMateriaPrima = value),
                 hint: Text('Selecciona Materia Prima'),
                 validator: (value) => value == null ? 'Campo requerido' : null,
+                decoration: _getInputDecoration('Materia Prima'),
+
               ),
               DropdownButtonFormField(
                 items: proveedores.map((item) {
@@ -136,14 +145,32 @@ class _AgregarCompraPageState extends State<AgregarCompraPage> {
                 onChanged: (value) => setState(() => _selectedProveedor = value),
                 hint: Text('Selecciona Proveedor'),
                 validator: (value) => value == null ? 'Campo requerido' : null,
+                decoration: _getInputDecoration('Proveedor'), // Agregar esta línea
+
               ),
               ElevatedButton(
                 onPressed: _agregarCompra,
                 child: Text('Agregar Compra'),
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFF483D8B), //
+                ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _getInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Color(0xFF483D8B)), // Cambia el color del texto a morado
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF483D8B)), // Cambia el color de la línea a morado
+      ),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF483D8B)), // Cambia el color de la línea a morado
       ),
     );
   }
