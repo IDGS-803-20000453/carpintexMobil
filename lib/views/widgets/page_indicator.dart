@@ -14,13 +14,31 @@ class PageIndicator extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.arrow_left),
+          GestureDetector(
+            onTap: () {
+              // Verifica si no estamos en la primera página
+              if (controller.page! > 0) {
+                controller.previousPage(
+                    duration: Duration(milliseconds: 300), curve: Curves.ease);
+              }
+            },
+            child: Icon(Icons.arrow_left),
+          ),
           SmoothPageIndicator(
             controller: controller,
             count: count,
             effect: WormEffect(),
           ),
-          Icon(Icons.arrow_right),
+          GestureDetector(
+            onTap: () {
+              // Verifica si no estamos en la última página
+              if (controller.page! < count - 1) {
+                controller.nextPage(
+                    duration: Duration(milliseconds: 300), curve: Curves.ease);
+              }
+            },
+            child: Icon(Icons.arrow_right),
+          ),
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:carpintex/views/admin_drawer.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
@@ -55,7 +56,11 @@ class _UserListPageState extends State<UserListPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Lista de usuarios"),
-          leading: Icon(Icons.get_app),
+
+          leading: IconButton(
+            icon: Icon(Icons.menu), // Ícono de menú hamburguesa
+            onPressed: () => Scaffold.of(context).openDrawer(), // Abre el drawer
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.search),
@@ -71,6 +76,7 @@ class _UserListPageState extends State<UserListPage> {
             ),
           ],
         ),
+          drawer: AdminDrawer(),
         body: Container(
           padding: EdgeInsets.all(16.0),
           child: GridView.builder(

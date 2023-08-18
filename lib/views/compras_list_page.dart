@@ -1,3 +1,7 @@
+import 'package:carpintex/views/AgregarCompraPage.dart';
+import 'package:carpintex/views/ConnectionStatus.dart';
+import 'package:carpintex/views/EditarCompraPage.dart';
+import 'package:carpintex/views/admin_drawer.dart';
 import 'package:carpintex/views/widgets/compra_card.dart';
 import 'package:carpintex/views/widgets/sort_dropdown.dart'; // Importa el SortDropdown
 import 'package:carpintex/views/widgets/search_bar.dart' as myWidgets;
@@ -7,8 +11,10 @@ import 'package:carpintex/models/compras_models.dart';
 import 'package:carpintex/services/compras_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class ComprasConNombresPage extends StatefulWidget {
+
   final ComprasApiService apiService;
 
   ComprasConNombresPage({required this.apiService});
@@ -18,20 +24,63 @@ class ComprasConNombresPage extends StatefulWidget {
 }
 
 class _ComprasConNombresPageState extends State<ComprasConNombresPage> {
+  late ConnectionStatus connectionStatus; // Declaración de la variable
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void onEditCompra(CompraConNombres compraConNombres) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditarCompraPage(apiService: widget.apiService, compraId: compraConNombres.compra.id), // Pasa los parámetros correctos
+      ),
+    ).then((result) {
+      if (result == true) {
+        _fetchComprasConNombres(); // Recarga los registros si se editó una compra
+      }
+    });
+  }
+
+  void onDeleteCompra(int id) {
+    widget.apiService.eliminarCompra(id).then((_) {
+      _fetchComprasConNombres(); // Recarga los registros si se eliminó una compra
+    }).catchError((error) {
+      // Maneja el error si algo sale mal
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al eliminar la compra: $error')),
+      );
+    });
+  }
+
+
+
   List<CompraConNombres> comprasConNombres = [];
   List<CompraConNombres> filteredCompras = [];
   TextEditingController searchController = TextEditingController();
   String dropdownValue = 'Fecha. Más antiguo';
   int itemsPerPage = 5;
   PageController pageController = PageController();
+  bool isLoading = true; // Indicador de carga
 
   @override
   void initState() {
     super.initState();
+    // La inicialización de connectionStatus se ha eliminado de aquí
     _fetchComprasConNombres();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    connectionStatus = Provider.of<ConnectionStatus>(context); // Inicialización aquí
+    // Puedes continuar usando connectionStatus en este método si es necesario
+  }
+
+
   Future<void> _fetchComprasConNombres() async {
+    setState(() {
+      isLoading = true; // Comienza la carga
+    });
     try {
       print('Fetching compras con nombres...');
       List<CompraConNombres> compras = await widget.apiService.getCompraConNombres();
@@ -39,9 +88,13 @@ class _ComprasConNombresPageState extends State<ComprasConNombresPage> {
       setState(() {
         comprasConNombres = compras;
         filteredCompras = compras;
+        isLoading = false; // Finaliza la carga
       });
     } catch (e) {
       print('Error fetching compras con nombres: $e');
+      setState(() {
+        isLoading = false; // Finaliza la carga en caso de error
+      });
     }
   }
 
@@ -76,57 +129,118 @@ class _ComprasConNombresPageState extends State<ComprasConNombresPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        key: _scaffoldKey, // Usa la clave aquí
+
         appBar: AppBar(
           title: Text("Lista de Compras con Nombres"),
+          leading: IconButton(
+            icon: Icon(Icons.menu), // Ícono de menú hamburguesa
+            onPressed: () => _scaffoldKey.currentState!.openDrawer(), // Abre el drawer usando la clave del Scaffold
+          ),
+
         ),
-        body: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: myWidgets.SearchBar(controller: searchController, onChanged: (value) { // Utiliza el componente SearchBar
-                    setState(() {
-                      filteredCompras = comprasConNombres
-                          .where((compra) =>
-                      compra.nombreMateriaPrima.toLowerCase().contains(value.toLowerCase()) ||
-                          compra.nombreProveedor.toLowerCase().contains(value.toLowerCase()) ||
-                          compra.compra.cantidad.toString().contains(value) ||
-                          compra.compra.total.toString().contains(value))
-                          .toList();
-                      _sortCompras(dropdownValue);
-                    });
-                  }),
-                ),
-                SortDropdown(value: dropdownValue, onChanged: _sortCompras), // Utiliza el componente SortDropdown
-              ],
-            ),
-            Expanded(
-              child: PageView.builder(
-                controller: pageController,
-                itemCount: (filteredCompras.length / itemsPerPage).ceil(),
-                itemBuilder: (ctx, pageIndex) {
-                  return ListView.separated(
-                    itemCount: itemsPerPage,
-                    itemBuilder: (ctx, index) {
-                      int actualIndex = pageIndex * itemsPerPage + index;
-                      if (actualIndex >= filteredCompras.length) return Container();
-                      return CompraCard(compraConNombres: filteredCompras[actualIndex]); // Utiliza el componente CompraCard
-                    },
-                    separatorBuilder: (ctx, index) => Divider(),
-                  );
-                },
+        drawer: AdminDrawer(),
+
+        body: Container(
+
+          decoration: woodBackground(), // Aplica la decoración aquí
+          child: isLoading
+            ? Center(child: CircularProgressIndicator()) // Muestra la ruedita de carga si está cargando
+            : RefreshIndicator(
+          onRefresh: _fetchComprasConNombres, // Recarga los registros al arrastrar hacia abajo
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: myWidgets.SearchBar(controller: searchController, onChanged: (value) { // Utiliza el componente SearchBar
+                      setState(() {
+                        filteredCompras = comprasConNombres
+                            .where((compra) =>
+                        compra.nombreMateriaPrima.toLowerCase().contains(value.toLowerCase()) ||
+                            compra.nombreProveedor.toLowerCase().contains(value.toLowerCase()) ||
+                            compra.compra.cantidad.toString().contains(value) ||
+                            compra.compra.total.toString().contains(value))
+                            .toList();
+                        _sortCompras(dropdownValue);
+                      });
+                    }),
+                  ),
+                  SortDropdown(value: dropdownValue, onChanged: _sortCompras), // Utiliza el componente SortDropdown
+                ],
               ),
-            ),
-            PageIndicator(controller: pageController, count: (filteredCompras.length / itemsPerPage).ceil()), // Utiliza el componente PageIndicator
-          ],
+              // Aquí es donde añado la lógica para mostrar el estado de la conexión
+              if (!connectionStatus.isConnected)
+                Text(connectionStatus.message, style: TextStyle(color: Colors.red))
+              else
+                Text(connectionStatus.message, style: TextStyle(color: Colors.green)),
+              Expanded(
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: (filteredCompras.length / itemsPerPage).ceil(),
+                  itemBuilder: (ctx, pageIndex) {
+                    return ListView.separated(
+                      itemCount: itemsPerPage,
+                      itemBuilder: (ctx, index) {
+                        int actualIndex = pageIndex * itemsPerPage + index;
+                        if (actualIndex >= filteredCompras.length) return Container();
+                        return CompraCard(
+                          compraConNombres: filteredCompras[actualIndex],
+                          onEdit: () => onEditCompra(filteredCompras[actualIndex]), // Pasa la función de edición
+                          onDelete: () => onDeleteCompra(filteredCompras[actualIndex].compra.id), // Pasa la función de eliminación
+                          index: actualIndex, // Pasa el índice actual para los colores alternados
+                        );
+
+
+                      },
+                      separatorBuilder: (ctx, index) => Divider(),
+                    );
+                  },
+                ),
+              ),
+              PageIndicator(controller: pageController, count: (filteredCompras.length / itemsPerPage).ceil()), // Utiliza el componente PageIndicator
+            ],
+          ),
         ),
+      ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Acción para agregar un nuevo elemento
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AgregarCompraPage(apiService: widget.apiService),
+              ),
+            );
+            if (result == true) {
+              _fetchComprasConNombres(); // Recarga los registros si se agregó una compra
+            }
           },
           child: Icon(Icons.add),
         ),
       ),
     );
   }
+
+
+
 }
+
+BoxDecoration woodBackground() {
+  return BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFFebeaea), // Color principal
+        Color(0xFFdcdcdc), // Ligeramente más oscuro para el degradado
+      ],
+    ),
+  );
+}
+
+
+
+
+
+
+

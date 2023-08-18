@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:carpintex/services/api_service.dart';
+import 'package:carpintex/views/ConnectionStatus.dart';
 import 'package:carpintex/views/compras_list_page.dart';
+import 'package:carpintex/views/login.dart'; // Asegúrate de importar la clase Login aquí
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Importa la biblioteca de SharedPreferences
 import 'services/compras_api_service.dart'; // Importa ComprasApiService
 
 class MyHttpOverrides extends HttpOverrides {
@@ -16,13 +20,15 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() {
   HttpOverrides.global = MyHttpOverrides(); // Usa MyHttpOverrides para deshabilitar la validación SSL
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ConnectionStatus(),
+      child: MyApp(),
+    ),
+  );
 }
 
-
 class MyApp extends StatelessWidget {
-  final ComprasApiService apiService = ComprasApiService(); // Crea una instancia de ComprasApiService
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,17 +46,34 @@ class _IntroPageState extends State<IntroPage> {
   @override
   void initState() {
     super.initState();
-    print('Starting intro page, waiting 5 seconds...'); // Log antes de la espera
-    Future.delayed(Duration(seconds: 5), () {
-      print('Navigating to ComprasConNombresPage...'); // Log antes de la navegación
+    _navigateBasedOnPreferences(); // Llama a la función para la navegación basada en SharedPreferences
+  }
+
+  _navigateBasedOnPreferences() async {
+    print('Starting intro page, waiting 5 seconds...');
+    await Future.delayed(Duration(seconds: 5)); // Espera 5 segundos
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userName = prefs.getString('name');
+    String? userEmail = prefs.getString('email');
+
+    // Comprueba si los valores de SharedPreferences son diferentes de los predeterminados
+    if (userName != null && userName != 'Nombre de Usuario' && userEmail != null && userEmail != 'email@dominio.com') {
+      print('Navigating to Compras List page...');
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => ComprasConNombresPage(apiService: ComprasApiService()),
         ),
       );
-    });
+    } else {
+      print('Navigating to Login page...');
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => Login(), // Cambia a la clase Login
+        ),
+      );
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
