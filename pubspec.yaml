@@ -42,6 +42,7 @@ dependencies:
   vibration: ^1.8.1
   shared_preferences: ^2.2.0
   provider: ^6.0.5
+  image: ^4.0.17
 
 dev_dependencies:
   flutter_test:

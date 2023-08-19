@@ -54,7 +54,7 @@ class Producto {
       altura: (json['altura'] ?? 0).toDouble(),
       ancho: (json['ancho'] ?? 0).toDouble(),
       largo: (json['largo'] ?? 0).toDouble(),
-      imagen: json['imagen'], // Ya es nulo, así que está bien
+      imagen: json['imagen'], // Ya es nulo
       total: (json['total'] ?? 0).toDouble(),
       estatus: json['estatus'],
       create_date: fecha,

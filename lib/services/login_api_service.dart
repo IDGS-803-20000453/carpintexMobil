@@ -14,7 +14,7 @@ class LoginApiService {
       );
 
       final jsonResponse = json.decode(response.body);
-      print('Respuesta recibida: $jsonResponse');
+      //print('Respuesta recibida: $jsonResponse');
 
       if (response.statusCode == 200) {
         int rolId = jsonResponse['rol_id'] as int;

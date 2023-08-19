@@ -137,7 +137,7 @@ class _ComprasConNombresPageState extends State<ComprasConNombresPage> {
         key: _scaffoldKey, // Usa la clave aquí
 
         appBar: AppBar(
-          title: Text("Lista de Compras con Nombres"),
+          title: Text("Lista de Compras"),
           leading: IconButton(
             icon: Icon(Icons.menu), // Ícono de menú hamburguesa
             onPressed: () => _scaffoldKey.currentState!.openDrawer(), // Abre el drawer usando la clave del Scaffold

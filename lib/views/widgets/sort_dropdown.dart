@@ -51,8 +51,6 @@ class ProductSortDropdown extends StatelessWidget {
           'Nombre. Z-A',
           'Stock. Menos a Más',
           'Stock. Más a Menos',
-          'Total. Menos a Más',
-          'Total. Más a Menos',
         ].map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,

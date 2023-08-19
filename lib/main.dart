@@ -22,7 +22,7 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = MyHttpOverrides(); // Usa MyHttpOverrides para deshabilitar la validación SSL
+  HttpOverrides.global = MyHttpOverrides(); // MyHttpOverrides para deshabilitar la validación SSL
 
   // Bloquea la orientación en modo vertical
   SystemChrome.setPreferredOrientations([
@@ -43,6 +43,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+
       home: IntroPage(),
     );
   }

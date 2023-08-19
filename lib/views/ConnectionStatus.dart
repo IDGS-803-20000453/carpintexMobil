@@ -14,7 +14,7 @@ class ConnectionStatus extends ChangeNotifier {
   bool get isConnected => _isConnected;
   String get message => _message;
 
-  String _previousMessage = ""; // Agregar esta variable para rastrear el mensaje anterior
+  String _previousMessage = ""; // Variable para rastrear el mensaje anterior
   bool _showingReconnectedMessage = false; // Estado de bloqueo
 
   Future<void> checkConnection() async {
@@ -32,7 +32,7 @@ class ConnectionStatus extends ChangeNotifier {
           _showingReconnectedMessage = true; // Establece el bloqueo
           notifyListeners(); // Notifica a los oyentes del cambio en el mensaje
           await Future.delayed(Duration(seconds: 8)); // Espera 8 segundos
-          _message = ""; // Luego limpia el mensaje
+          _message = ""; //  limpia el mensaje
           _showingReconnectedMessage = false; // Libera el bloqueo
           notifyListeners(); // Notifica a los oyentes del cambio en el mensaje
         } else {
